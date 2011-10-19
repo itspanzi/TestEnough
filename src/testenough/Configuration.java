@@ -1,37 +1,43 @@
 package testenough;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.Properties;
 
 public class Configuration {
-    private Set<String> includePacakges = new HashSet<String>();
+    static final String POPULATE_INCLUDE_PACKAGES = "populateIncludePackages";
+    private Properties properties = new Properties();
+    private HashSet<String> packages = new HashSet<String>();
 
     public Configuration(String config) {
         parseConfig(config);
     }
 
     private void parseConfig(String config) {
-        String[] lines = config.split("\n");
-        for (String line : lines) {
-            handlePackageInclude(line);
-        }
-    }
-
-    private void handlePackageInclude(String line) {
-        if (line.trim().startsWith("include:")) {
-            String packages = line.substring("include:".length());
-            for (String individualPackage : packages.split(",")) {
-                includePacakges.add(individualPackage.trim());
-            }
+        try {
+            properties.load(new ByteArrayInputStream(config.getBytes()));
+            populateIncludePackages();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public boolean shouldWeave(String className) {
+        if (packages.isEmpty()) return true;
         className = convertToNormalName(className);
-        for (String includePacakge : includePacakges) {
+        for (String includePacakge : packages) {
             if (className.startsWith(includePacakge)) return true;
         }
         return false;
+    }
+
+    private void populateIncludePackages() {
+        String includePackages = (String) properties.get(POPULATE_INCLUDE_PACKAGES);
+        if (includePackages == null) return;
+        for (String individualPackage : includePackages.split(",")) {
+            packages.add(individualPackage.trim());
+        }
     }
 
     private String convertToNormalName(String className) {
@@ -44,15 +50,16 @@ public class Configuration {
         if (o == null || getClass() != o.getClass()) return false;
 
         Configuration that = (Configuration) o;
-
-        if (includePacakges != null ? !includePacakges.equals(that.includePacakges) : that.includePacakges != null)
-            return false;
-
-        return true;
+        return !(properties != null ? !properties.equals(that.properties) : that.properties != null);
     }
 
     @Override
     public int hashCode() {
-        return includePacakges != null ? includePacakges.hashCode() : 0;
+        return properties != null ? properties.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Configuration{properties=%s}", properties);
     }
 }

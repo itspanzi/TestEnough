@@ -34,4 +34,12 @@ public class CallTrackingTransformer implements ClassFileTransformer {
     public int hashCode() {
         return configuration != null ? configuration.hashCode() : 0;
     }
+
+    @Override
+    public String toString() {
+        return "CallTrackingTransformer{" +
+                "configuration=" + configuration +
+                ", bcWeaver=" + bcWeaver +
+                '}';
+    }
 }
