@@ -9,6 +9,7 @@
     <property name="classes.dir" location="${target.dir}/classes"/>
     <property name="test.classes.dir" location="${target.dir}/test-classes"/>
     <property name="test.reports.dir" location="${target.dir}/reports"/>
+    <property name="pkg.dir" location="${target.dir}/pkg"/>
 
     <path id="dependencies">
         <fileset dir="${lib.dir}" includes="*.jar" id="dependencies.fileset"/>
@@ -29,10 +30,14 @@
         <path refid="test.dependencies"/>
     </path>
 
-    <target name="init">
+    <target name="init" depends="clean">
         <mkdir dir="${classes.dir}"/>
         <mkdir dir="${test.classes.dir}"/>
         <mkdir dir="${test.reports.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${target.dir}"/>
     </target>
 
     <target name="compile" depends="init">
@@ -57,5 +62,35 @@
                 <formatter type="plain"/>
             </batchtest>
         </junit>
+    </target>
+
+    <target name="-load.short.rev">
+        <exec executable="git" outputproperty="short_rev">
+            <arg line="describe --always"/>
+        </exec>
+    </target>
+
+
+    <target name="pkg" depends="test, -load.short.rev">
+        <property name="test.enough" value="test-enough"/>
+        <property name="test.enough.basename" value="${test.enough}-${short_rev}"/>
+        <property name="test.enough.basepath" value="${pkg.dir}/${test.enough}"/>
+        <property name="test.enough.jar.path" value="${test.enough.basepath}/${test.enough.basename}.jar"/>
+        <property name="test.enough.pkg.name" value="${test.enough.basename}.tar.gz"/>
+        <property name="test.enough.pkg.path" value="${pkg.dir}/${test.enough.basename}.tar"/>
+        <property name="test.enough.src.jar.name" value="${test.enough.basename}-src.jar"/>
+
+        <jar destfile="${test.enough.jar.path}">
+            <fileset dir="${classes.dir}"/>
+            <manifest>
+                <attribute name="Premain-Class" value="testenough.InstrumentingAgent"/>
+                <attribute name="Sealed" value="true"/>
+            </manifest>
+        </jar>
+        <zip basedir="${src.dir}" destfile="${test.enough.basepath}/${test.enough.src.jar.name}"/>
+        <copy todir="${test.enough.basepath}/lib">
+            <fileset dir="${lib.dir}" includes="*.jar"/>
+        </copy>
+        <tar basedir="${pkg.dir}" destfile="${pkg.dir}/${test.enough.pkg.name}" compression="gzip" />
     </target>
 </project>
