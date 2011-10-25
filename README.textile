@@ -1,0 +1,19 @@
+*TestEnough* is an attempt at solving the problem of _reducing the feedback time_ around making sure if the changes made to a codebase are fine. It is a library that helps you run a pruned set of tests (a small subset) picked from the entire test suite based on the changes made to production code. Thus, instead of running all the tests, it lets you run only a small, relevant set of tests.
+
+h2. Why?
+
+Typically teams following _continuous integration_ make sure that developers run the build locally and then check in if the build is green. The idea is to keep the main line green as much as possible. However, even with a very fast build of a few minutes, developers need to wait for those few minutes if they are running the build on their box. Even if the build is moved to a personal build server of sorts, so that pre-commit build is not happening on the local developer box, a few minutes still need to be spent before checking in.
+
+ On a large team, there could potentially be multiple commits during this few minutes window and you would then have to merge with upstream and re-run the build. It would be quite tedious if one gets into a merge-build loop.
+
+ This means, ideally, you would want as small a pre-commit build as possible.
+
+It also seems like a huge waste to run all tests when the change made is quite small. Especially, if a team follows the "Small checkin, frequent checkin" philosophy, it would definitely be wasteful to run all the tests all the time.
+
+To address these, is why *TestEnough* came into existence.
+
+h2. How?
+
+*TestEnough* is a Java agent library that uses *Byte Code Instrumentation* to figure out what methods were called. One can configure what is a test and what is production code which would then let *TestEnough* figure out what all code gets called from a given test. It maintains a map of "Method => [Tests]".
+
+This way, when running a build, based on what methods of production code have changed, *TestEnough* constructs a smaller list of tests. You would have a new build task that would use *TestEnough* and run this as the pre-commit build

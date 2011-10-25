@@ -4,8 +4,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import testenough.weaver.BCWeaver;
 
 import java.io.File;
@@ -13,8 +11,6 @@ import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.util.jar.JarFile;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
 public class InstrumentingAgentTest {
