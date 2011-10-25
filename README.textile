@@ -17,3 +17,7 @@ h2. How?
 *TestEnough* is a Java agent library that uses *Byte Code Instrumentation* to figure out what methods were called. One can configure what is a test and what is production code which would then let *TestEnough* figure out what all code gets called from a given test. It maintains a map of "Method => [Tests]".
 
 This way, when running a build, based on what methods of production code have changed, *TestEnough* constructs a smaller list of tests. You would have a new build task that would use *TestEnough* and run this as the pre-commit build
+
+h2. Why TestEnough?
+
+My wife thought it would be a good idea to name this after her. Her point was, I spend so much of my personal time hacking and since she is very supportive, why shouldn't I? We compromised by saying I will mention her intention instead here! (Here you go honey)
