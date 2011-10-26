@@ -46,6 +46,9 @@ public class InstrumentingAgent {
         Map<String, String> nameToValues = new HashMap<String, String>();
         if (argument.trim().isEmpty()) return nameToValues;
         for (String arg : argument.split("&")) {
+            if (!arg.contains(":")) {
+                throw new IllegalArgumentException("Arguments are name value pairs. Name and value are separated using ':'. Multiple arguments are separated using '&'");
+            }
             String[] nameAndValue = arg.split(":");
             nameToValues.put(nameAndValue[0], nameAndValue[1]);
         }

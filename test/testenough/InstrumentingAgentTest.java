@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.util.jar.JarFile;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
 public class InstrumentingAgentTest {
@@ -29,7 +31,6 @@ public class InstrumentingAgentTest {
 
     @After
     public void tearDown() throws Exception {
-        verify(instrumentation, atLeastOnce()).appendToBootstrapClassLoaderSearch(any(JarFile.class));
         verifyNoMoreInteractions(instrumentation);
         FileUtils.forceDelete(config);
     }
@@ -40,7 +41,7 @@ public class InstrumentingAgentTest {
 
         Configuration configuration = new Configuration(configFileContents());
         verify(instrumentation).addTransformer(new CallTrackingTransformer(configuration, new BCWeaver()));
-
+        verify(instrumentation, atLeastOnce()).appendToBootstrapClassLoaderSearch(any(JarFile.class));
     }
 
     private String configFileContents() {
@@ -53,6 +54,7 @@ public class InstrumentingAgentTest {
 
         Configuration configuration = new Configuration(configFileContents());
         verify(instrumentation).addTransformer(new CallTrackingTransformer(configuration, new BCWeaver()));
+        verify(instrumentation, atLeastOnce()).appendToBootstrapClassLoaderSearch(any(JarFile.class));
     }
 
     @Test
@@ -61,6 +63,7 @@ public class InstrumentingAgentTest {
 
         Configuration configuration = new Configuration("");
         verify(instrumentation).addTransformer(new CallTrackingTransformer(configuration, new BCWeaver()));
+        verify(instrumentation, atLeastOnce()).appendToBootstrapClassLoaderSearch(any(JarFile.class));
     }
 
     @Test
@@ -68,6 +71,7 @@ public class InstrumentingAgentTest {
         InstrumentingAgent.premain(String.format("%s:test_folder", InstrumentingAgent.LIB_DIR), instrumentation);
         Configuration configuration = new Configuration(configFileContents());
         verify(instrumentation).addTransformer(new CallTrackingTransformer(configuration, new BCWeaver()));
+        verify(instrumentation, atLeastOnce()).appendToBootstrapClassLoaderSearch(any(JarFile.class));
     }
 
     @Test
@@ -75,5 +79,15 @@ public class InstrumentingAgentTest {
         InstrumentingAgent.premain("", instrumentation);
         Configuration configuration = new Configuration(configFileContents());
         verify(instrumentation).addTransformer(new CallTrackingTransformer(configuration, new BCWeaver()));
+        verify(instrumentation, atLeastOnce()).appendToBootstrapClassLoaderSearch(any(JarFile.class));
+    }
+
+    @Test
+    public void shouldGiveNiceErrorMessageWhenCannotParse() throws IOException {
+        try {
+            InstrumentingAgent.premain("FooBarBaaz", instrumentation);
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), is("Arguments are name value pairs. Name and value are separated using ':'. Multiple arguments are separated using '&'"));
+        }
     }
 }
