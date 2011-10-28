@@ -9,6 +9,8 @@ public class Configuration {
     static final String POPULATE_INCLUDE_PACKAGES = "populateIncludePackages";
     private Properties properties = new Properties();
     private HashSet<String> packages = new HashSet<String>();
+    public static final String SAMPLE_PRODUCTION_CLASS = "sampleProductionClass";
+    public static final String CODE_TO_INSERT = "codeToInsert";
 
     public Configuration(String config) {
         parseConfig(config);
@@ -42,6 +44,22 @@ public class Configuration {
 
     private String convertToNormalName(String className) {
         return className.replaceAll("/", ".");
+    }
+
+    public String sampleClassFromProd() {
+        String property = properties.getProperty(SAMPLE_PRODUCTION_CLASS);
+        if (property == null) {
+            throw new RuntimeException(String.format("Sample production class property is not specified. Please specify the '%s=com.org.SampleClass' in the configuration " +
+                    "where 'com.org.SampleClass' is the Fully Qualified Name of one class from your application under test.This is used to figure out the class path of the " +
+                    "production classes dynamically.", Configuration.SAMPLE_PRODUCTION_CLASS));
+        }
+        return property;
+    }
+
+    public String codeToBeInserted() {
+        String defaultCode = "testenough.counter.Track.trackCurrentThread();";
+        String property = properties.getProperty(CODE_TO_INSERT);
+        return property == null ? defaultCode : property;
     }
 
     @Override

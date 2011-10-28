@@ -21,16 +21,20 @@ public class InstrumentingAgent {
     public static void premain(String argument, Instrumentation instrumentation) throws IOException {
         Map<String, String> nameToValues = parseArguments(argument);
         addJarsFromLibToBootstrapperClassPath(instrumentation, nameToValues);
-        instrumentation.addTransformer(new CallTrackingTransformer(new Configuration(configContents(nameToValues)), new BCWeaver()));
+        Configuration configuration = new Configuration(configContents(nameToValues));
+        instrumentation.addTransformer(new CallTrackingTransformer(configuration, new BCWeaver(configuration)));
     }
 
     private static void addJarsFromLibToBootstrapperClassPath(Instrumentation instrumentation, Map<String, String> nameToValues) throws IOException {
         String libDir = nameToValues.get(LIB_DIR);
-        if (libDir==null) libDir = DEFAULT_LIB_DIR;
-        Collection<File> files = FileUtils.listFiles(new File(libDir), new String[]{"jar"}, true);
-        for (File jar : files) {
+        if (libDir == null) libDir = DEFAULT_LIB_DIR;
+        for (File jar : allJarsInTheDir(libDir)) {
             instrumentation.appendToBootstrapClassLoaderSearch(new JarFile(jar));
         }
+    }
+
+    private static Collection<File> allJarsInTheDir(String libDir) {
+        return FileUtils.listFiles(new File(libDir), new String[]{"jar"}, true);
     }
 
     private static String configContents(Map<String, String> nameToValues) throws IOException {

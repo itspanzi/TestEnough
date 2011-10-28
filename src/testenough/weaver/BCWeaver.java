@@ -1,11 +1,20 @@
 package testenough.weaver;
 
 import javassist.*;
+import testenough.Configuration;
 
 import java.io.ByteArrayInputStream;
 
 public class BCWeaver {
-    public byte[] weave(ClassLoader loader, byte[] byteCode) {
+
+    private Configuration configuration;
+
+    public BCWeaver(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
+    public byte[] weave(String className, ClassLoader loader, byte[] byteCode) {
+        if (!configuration.shouldWeave(className)) return null;
         try {
             CtClass ctClass = byteCodeAsClass(loader, copyOf(byteCode));
             for (CtMethod method : ctClass.getDeclaredMethods()) {
@@ -29,10 +38,6 @@ public class BCWeaver {
         return copy;
     }
 
-    private String codeToBeInserted() {
-        return "testenough.counter.Track.trackCurrentThread();";
-    }
-
     private boolean shouldEnhance(CtMethod method) {
         return !method.isEmpty() && !Modifier.isAbstract(method.getModifiers());
     }
@@ -50,7 +55,11 @@ public class BCWeaver {
     }
 
     private String sampleClassFromProd() {
-        return "mtrace.spike.Another";
+        return configuration.sampleClassFromProd();
+    }
+
+    private String codeToBeInserted() {
+        return configuration.codeToBeInserted();
     }
 
     @Override

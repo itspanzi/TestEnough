@@ -32,16 +32,7 @@ public class CallTrackingTransformerTest {
 
         transformer.transform(loader, "foo/bar/HelloWorld", null, null, bytes);
 
-        verify(weaver).weave(loader, bytes);
-        verifyNoMoreInteractions(weaver);
-    }
-
-    @Test
-    public void shouldNotWeaveIfNotConfiguredToBeWeaved() throws IllegalClassFormatException {
-        when(configuration.shouldWeave("foo/bar/HelloWorld")).thenReturn(false);
-
-        transformer.transform(loader, "foo/bar/HelloWorld", null, null, bytes);
-
+        verify(weaver).weave("foo/bar/HelloWorld", loader, bytes);
         verifyNoMoreInteractions(weaver);
     }
 }

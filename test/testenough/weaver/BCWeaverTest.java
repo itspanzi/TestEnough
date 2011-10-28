@@ -7,6 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import testenough.Configuration;
 import testenough.fortest.ClassThatWillBeWeaved;
 import testenough.fortest.TestTracker;
 
@@ -14,27 +15,35 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.instrument.IllegalClassFormatException;
 import java.net.URL;
 
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 public class BCWeaverTest {
 
     private File createdClass;
     private ClassLoader loader;
+    private Configuration configuration;
 
     @Before
     public void setUp() throws Exception {
-        loader = Thread.currentThread().getContextClassLoader();
-        String name = className(this.getClass());
-        URL resource = loader.getResource(name);
-        createdClass = new File(new File(resource.getFile()).getParentFile(), ClassThatWillBeWeaved.class.getSimpleName() + ".class");
-        TestTracker.counter = 0;
+        configuration = mock(Configuration.class);
     }
 
-    @After
-    public void tearDown() throws Exception {
-        FileUtils.forceDelete(createdClass);
+    @Test
+    public void shouldNotWeaveIfNotConfiguredToBeWeaved() throws IllegalClassFormatException {
+        String className = "foo/bar/HelloWorld";
+        when(configuration.shouldWeave(className)).thenReturn(false);
+
+        BCWeaver bcWeaver = new BCWeaver(configuration);
+        assertThat(bcWeaver.weave(className, loader, new byte[0]), is(nullValue()));
     }
 
     @Test
@@ -42,8 +51,8 @@ public class BCWeaverTest {
     public void testWeaveTheGivenCallInTheMethod() throws Exception {
         byte[] bytes = bytecodeFor(ClassThatWillBeWeaved.class);
 
-        BCWeaver bcWeaver = new BCWeaver();
-        byte[] weaved = bcWeaver.weave(loader, bytes);
+        BCWeaver bcWeaver = new BCWeaver(null);
+        byte[] weaved = bcWeaver.weave(null, loader, bytes);
         FileUtils.writeByteArrayToFile(createdClass, weaved);
 
         Class<?> createdClass = loader.loadClass("testenough.weaver.ClassThatWillBeWeaved");

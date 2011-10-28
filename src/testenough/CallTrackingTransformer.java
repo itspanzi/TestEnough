@@ -6,6 +6,9 @@ import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
 
+/**
+ * Does not have a job anymore. We should just move to bcweaver
+ */
 public class CallTrackingTransformer implements ClassFileTransformer {
 
     private Configuration configuration;
@@ -17,8 +20,7 @@ public class CallTrackingTransformer implements ClassFileTransformer {
     }
 
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
-        if (!configuration.shouldWeave(className)) return null;
-        return bcWeaver.weave(loader, classfileBuffer);
+        return bcWeaver.weave(className, loader, classfileBuffer);
     }
 
     @Override

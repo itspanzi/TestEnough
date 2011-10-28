@@ -2,6 +2,7 @@ package testenough;
 
 import org.junit.Test;
 
+import static junit.framework.Assert.fail;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -27,5 +28,33 @@ public class ConfigurationTest {
         assertThat(configuration.shouldWeave("com/tw/go/Another"), is(true));
         assertThat(configuration.shouldWeave("com/tw/DoesNotMatch"), is(true));
         assertThat(configuration.shouldWeave("org/tw/DoesNotMatch"), is(true));
+    }
+
+    @Test
+    public void testReturnTheNameOfAClassInProduction() throws Exception {
+        Configuration configuration = new Configuration(String.format("%s=com.sample.SimpleClass", Configuration.SAMPLE_PRODUCTION_CLASS));
+        assertThat(configuration.sampleClassFromProd(), is("com.sample.SimpleClass"));
+    }
+
+    @Test
+    public void testThrowExceptionWhenTheNameOfAClassInProductionIsNotMentioned() throws Exception {
+        Configuration configuration = new Configuration(String.format("foo=bar"));
+        try {
+            configuration.sampleClassFromProd();
+            fail("Should have failed because the sample production class name is not given");
+        } catch (Exception e) {
+            assertThat(e.getMessage(), is(String.format("Sample production class property is not specified. Please specify the '%s=com.org.SampleClass' in the configuration " +
+                    "where 'com.org.SampleClass' is the Fully Qualified Name of one class from your application under test.This is used to figure out the class path of the " +
+                    "production classes dynamically.", Configuration.SAMPLE_PRODUCTION_CLASS)));
+        }
+    }
+
+    @Test
+    public void testShouldGiveTheCodeToInserted() throws Exception {
+        Configuration configuration = new Configuration(String.format("foo=bar"));
+        assertThat(configuration.codeToBeInserted(), is("testenough.counter.Track.trackCurrentThread();"));
+        String code = "System.out.println(\"Hello World\");";
+        configuration = new Configuration(String.format("%s=%s", Configuration.CODE_TO_INSERT, code));
+        assertThat(configuration.codeToBeInserted(), is(code));
     }
 }
