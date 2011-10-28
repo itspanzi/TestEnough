@@ -4,6 +4,7 @@
     <property name="test.dir" location="${basedir}/test"/>
     <property name="lib.dir" location="${basedir}/lib"/>
     <property name="test.lib.dir" location="${basedir}/test-lib"/>
+    <property name="release.dir" location="${basedir}/release"/>
 
     <property name="target.dir" location="${basedir}/target"/>
     <property name="classes.dir" location="${target.dir}/classes"/>
@@ -90,6 +91,9 @@
         <zip basedir="${src.dir}" destfile="${test.enough.basepath}/${test.enough.src.jar.name}"/>
         <copy todir="${test.enough.basepath}/lib">
             <fileset dir="${lib.dir}" includes="*.jar"/>
+        </copy>
+        <copy todir="${test.enough.basepath}">
+            <fileset dir="${release.dir}" includes="*"/>
         </copy>
         <tar basedir="${pkg.dir}" destfile="${pkg.dir}/${test.enough.pkg.name}" compression="gzip" />
     </target>
