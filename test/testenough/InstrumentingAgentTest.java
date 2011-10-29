@@ -40,7 +40,7 @@ public class InstrumentingAgentTest {
         InstrumentingAgent.premain(String.format("%s:resource/config.properties&%s:.", InstrumentingAgent.CONFIG_FILE_PATH, InstrumentingAgent.LIB_DIR), instrumentation);
 
         Configuration configuration = new Configuration(configFileContents());
-        verify(instrumentation).addTransformer(new CallTrackingTransformer(configuration, new BCWeaver(configuration)));
+        verify(instrumentation).addTransformer(new BCWeaver(configuration));
         verify(instrumentation, atLeastOnce()).appendToBootstrapClassLoaderSearch(any(JarFile.class));
     }
 
@@ -53,7 +53,7 @@ public class InstrumentingAgentTest {
         InstrumentingAgent.premain(String.format("%s:.", InstrumentingAgent.LIB_DIR), instrumentation);
 
         Configuration configuration = new Configuration(configFileContents());
-        verify(instrumentation).addTransformer(new CallTrackingTransformer(configuration, new BCWeaver(configuration)));
+        verify(instrumentation).addTransformer(new BCWeaver(configuration));
         verify(instrumentation, atLeastOnce()).appendToBootstrapClassLoaderSearch(any(JarFile.class));
     }
 
@@ -62,7 +62,7 @@ public class InstrumentingAgentTest {
         InstrumentingAgent.premain(String.format("%s:foo_bar&%s:.", InstrumentingAgent.CONFIG_FILE_PATH, InstrumentingAgent.LIB_DIR), instrumentation);
 
         Configuration configuration = new Configuration("");
-        verify(instrumentation).addTransformer(new CallTrackingTransformer(configuration, new BCWeaver(configuration)));
+        verify(instrumentation).addTransformer(new BCWeaver(configuration));
         verify(instrumentation, atLeastOnce()).appendToBootstrapClassLoaderSearch(any(JarFile.class));
     }
 
@@ -70,7 +70,7 @@ public class InstrumentingAgentTest {
     public void testShouldAddTheJarsInLibDirToBootstrapperClasspath() throws Exception {
         InstrumentingAgent.premain(String.format("%s:test_folder", InstrumentingAgent.LIB_DIR), instrumentation);
         Configuration configuration = new Configuration(configFileContents());
-        verify(instrumentation).addTransformer(new CallTrackingTransformer(configuration, new BCWeaver(configuration)));
+        verify(instrumentation).addTransformer(new BCWeaver(configuration));
         verify(instrumentation, atLeastOnce()).appendToBootstrapClassLoaderSearch(any(JarFile.class));
     }
 
@@ -78,7 +78,7 @@ public class InstrumentingAgentTest {
     public void shouldDefaultTheLibFolder() throws IOException {
         InstrumentingAgent.premain("", instrumentation);
         Configuration configuration = new Configuration(configFileContents());
-        verify(instrumentation).addTransformer(new CallTrackingTransformer(configuration, new BCWeaver(configuration)));
+        verify(instrumentation).addTransformer(new BCWeaver(configuration));
         verify(instrumentation, atLeastOnce()).appendToBootstrapClassLoaderSearch(any(JarFile.class));
     }
 

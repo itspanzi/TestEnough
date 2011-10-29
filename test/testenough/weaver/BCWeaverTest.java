@@ -22,9 +22,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class BCWeaverTest {
 
@@ -43,7 +41,7 @@ public class BCWeaverTest {
         when(configuration.shouldWeave(className)).thenReturn(false);
 
         BCWeaver bcWeaver = new BCWeaver(configuration);
-        assertThat(bcWeaver.weave(className, loader, new byte[0]), is(nullValue()));
+        assertThat(bcWeaver.transform(loader, className, null, null, new byte[0]), is(nullValue()));
     }
 
     @Test
@@ -52,7 +50,7 @@ public class BCWeaverTest {
         byte[] bytes = bytecodeFor(ClassThatWillBeWeaved.class);
 
         BCWeaver bcWeaver = new BCWeaver(null);
-        byte[] weaved = bcWeaver.weave(null, loader, bytes);
+        byte[] weaved = bcWeaver.transform(loader, null, null, null, bytes);
         FileUtils.writeByteArrayToFile(createdClass, weaved);
 
         Class<?> createdClass = loader.loadClass("testenough.weaver.ClassThatWillBeWeaved");

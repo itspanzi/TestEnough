@@ -4,8 +4,11 @@ import javassist.*;
 import testenough.Configuration;
 
 import java.io.ByteArrayInputStream;
+import java.lang.instrument.ClassFileTransformer;
+import java.lang.instrument.IllegalClassFormatException;
+import java.security.ProtectionDomain;
 
-public class BCWeaver {
+public class BCWeaver implements ClassFileTransformer {
 
     private Configuration configuration;
 
@@ -13,8 +16,12 @@ public class BCWeaver {
         this.configuration = configuration;
     }
 
-    public byte[] weave(String className, ClassLoader loader, byte[] byteCode) {
+    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
         if (!configuration.shouldWeave(className)) return null;
+        return weave(loader, classfileBuffer);
+    }
+
+    private byte[] weave(ClassLoader loader, byte[] byteCode) {
         try {
             CtClass ctClass = byteCodeAsClass(loader, copyOf(byteCode));
             for (CtMethod method : ctClass.getDeclaredMethods()) {
@@ -63,7 +70,16 @@ public class BCWeaver {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return true;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BCWeaver bcWeaver = (BCWeaver) o;
+        return !(configuration != null ? !configuration.equals(bcWeaver.configuration) : bcWeaver.configuration != null);
+    }
+
+    @Override
+    public int hashCode() {
+        return configuration != null ? configuration.hashCode() : 0;
     }
 }

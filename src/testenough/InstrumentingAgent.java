@@ -22,7 +22,7 @@ public class InstrumentingAgent {
         Map<String, String> nameToValues = parseArguments(argument);
         addJarsFromLibToBootstrapperClassPath(instrumentation, nameToValues);
         Configuration configuration = new Configuration(configContents(nameToValues));
-        instrumentation.addTransformer(new CallTrackingTransformer(configuration, new BCWeaver(configuration)));
+        instrumentation.addTransformer(new BCWeaver(configuration));
     }
 
     private static void addJarsFromLibToBootstrapperClassPath(Instrumentation instrumentation, Map<String, String> nameToValues) throws IOException {
