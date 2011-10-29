@@ -1,0 +1,13 @@
+Description
+===========
+
+TestEnough is a library that helps you run a very small subset of tests based on changes to production code.
+
+First, you need to run TestEnough once so that the information about which method is tested by what tests is captured. Once this information is available,
+TestEnough can run only those tests which test the methods that were changed.
+
+How does it work?
+=================
+
+TestEnough does a Byte Code Instrumentation of the classes that are loaded and adds a piece of code to every method definition. This code gets called
+whenever a method is called. This is the tracker code that figures out the test that is running currently.

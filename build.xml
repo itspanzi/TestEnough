@@ -95,6 +95,7 @@
         <copy todir="${test.enough.basepath}">
             <fileset dir="${release.dir}" includes="*"/>
         </copy>
+        <copy todir="${test.enough.basepath}" file="${basedir}/LICENSE"/>
         <tar basedir="${pkg.dir}" destfile="${pkg.dir}/${test.enough.pkg.name}" compression="gzip" />
     </target>
 </project>
