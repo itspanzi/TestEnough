@@ -11,6 +11,7 @@ public class Configuration {
     private HashSet<String> packages = new HashSet<String>();
     public static final String SAMPLE_PRODUCTION_CLASS = "sampleProductionClass";
     public static final String CODE_TO_INSERT = "codeToInsert";
+    public static final String TEST_CLASS_PATTERN = "testClassPattern";
 
     public Configuration(String config) {
         parseConfig(config);
@@ -57,9 +58,7 @@ public class Configuration {
     }
 
     public String codeToBeInserted() {
-        String defaultCode = "testenough.counter.Track.trackCurrentThread();";
-        String property = properties.getProperty(CODE_TO_INSERT);
-        return property == null ? defaultCode : property;
+        return properties.getProperty(CODE_TO_INSERT, "testenough.counter.Track.trackCurrentThread();");
     }
 
     @Override
@@ -79,5 +78,9 @@ public class Configuration {
     @Override
     public String toString() {
         return String.format("Configuration{properties=%s}", properties);
+    }
+
+    public String testClassNamePattern() {
+        return properties.getProperty(TEST_CLASS_PATTERN, ".*Test");
     }
 }

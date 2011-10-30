@@ -1,23 +1,35 @@
 package testenough.counter;
 
+import testenough.Configuration;
+
 import java.util.*;
 
 public class Track {
     private static Map<String, Set<String>> methodToTests = new HashMap<String, Set<String>>();
+    private static final int INDEX_OF_CALLER = 2;
+    private static Configuration configuration;
 
     public static void trackCurrentThread() {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-        String actualFrameName = methodAsString(stackTrace[2]);
+        String actualFrameName = methodAsString(stackTrace[INDEX_OF_CALLER]);
         for (StackTraceElement stackTraceElement : stackTrace) {
-            if (stackTraceElement.getClassName().endsWith("Test")) {
-                Set<String> tests = methodToTests.get(actualFrameName);
-                if (tests == null) {
-                    tests = new TreeSet<String>();
-                    methodToTests.put(actualFrameName, tests);
-                }
-                tests.add(methodAsString(stackTraceElement));
+            if (stackTraceElement.getClassName().matches(testClassNamePattern())) {
+                trackTest(actualFrameName, stackTraceElement);
             }
         }
+    }
+
+    private static String testClassNamePattern() {
+        return configuration.testClassNamePattern();
+    }
+
+    private static void trackTest(String actualFrameName, StackTraceElement stackTraceElement) {
+        Set<String> tests = methodToTests.get(actualFrameName);
+        if (tests == null) {
+            tests = new TreeSet<String>();
+            methodToTests.put(actualFrameName, tests);
+        }
+        tests.add(stackTraceElement.getClassName());
     }
 
     public static Set<String> testsFor(String methodAsString) {
@@ -30,5 +42,13 @@ public class Track {
 
     private static String methodAsString(StackTraceElement frame) {
         return methodAsString(frame.getClassName(), frame.getMethodName());
+    }
+
+    public static void setConfiguration(Configuration configuration) {
+        Track.configuration = configuration;
+    }
+
+    public static void reset() {
+        methodToTests.clear();
     }
 }
