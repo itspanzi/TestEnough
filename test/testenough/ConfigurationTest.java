@@ -57,4 +57,12 @@ public class ConfigurationTest {
         configuration = new Configuration(String.format("%s=%s", Configuration.CODE_TO_INSERT, code));
         assertThat(configuration.codeToBeInserted(), is(code));
     }
+
+    @Test
+    public void testShouldGiveTheFileToPersistTrackingInformationIn() throws Exception {
+        Configuration configuration = new Configuration(String.format("%s=sample/tracking_info_file", Configuration.TRACKING_INFO_FILE_PATH));
+        assertThat(configuration.trackingInfoFilePath(), is("sample/tracking_info_file"));
+        configuration = new Configuration("");
+        assertThat(configuration.trackingInfoFilePath(), is("out/te_tracking_info.txt"));
+    }
 }

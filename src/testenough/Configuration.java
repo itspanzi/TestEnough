@@ -12,6 +12,7 @@ public class Configuration {
     public static final String SAMPLE_PRODUCTION_CLASS = "sampleProductionClass";
     public static final String CODE_TO_INSERT = "codeToInsert";
     public static final String TEST_CLASS_PATTERN = "testClassPattern";
+    public static final String TRACKING_INFO_FILE_PATH = "trackingInformationFilePath";
 
     public Configuration(String config) {
         parseConfig(config);
@@ -82,5 +83,9 @@ public class Configuration {
 
     public String testClassNamePattern() {
         return properties.getProperty(TEST_CLASS_PATTERN, ".*Test");
+    }
+
+    public String trackingInfoFilePath() {
+        return properties.getProperty(TRACKING_INFO_FILE_PATH, "out/te_tracking_info.txt");
     }
 }
