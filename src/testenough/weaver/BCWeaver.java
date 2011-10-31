@@ -1,6 +1,7 @@
 package testenough.weaver;
 
 import javassist.*;
+import javassist.bytecode.MethodInfo;
 import testenough.Configuration;
 
 import java.io.ByteArrayInputStream;
@@ -27,7 +28,7 @@ public class BCWeaver implements ClassFileTransformer {
             for (CtMethod method : ctClass.getDeclaredMethods()) {
                 if (shouldEnhance(method)) {
                     try {
-                        method.insertAfter(codeToBeInserted(), true);
+                        method.insertBefore(codeToBeInserted());
                     } catch (CannotCompileException e) {
                         System.out.println("Couldn't instrument: " + method + ". Caused by: " + e);
                     }
@@ -46,7 +47,8 @@ public class BCWeaver implements ClassFileTransformer {
     }
 
     private boolean shouldEnhance(CtMethod method) {
-        return !method.isEmpty() && !Modifier.isAbstract(method.getModifiers());
+        MethodInfo methodInfo = method.getMethodInfo();
+        return methodInfo.isMethod() && !methodInfo.isStaticInitializer() && !methodInfo.isConstructor() && !method.isEmpty() && !Modifier.isAbstract(method.getModifiers());
     }
 
     private CtClass byteCodeAsClass(ClassLoader loader, byte[] copy) throws Exception {

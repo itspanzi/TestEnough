@@ -82,7 +82,7 @@ public class Track {
                 builder.append(test).append(",");
             }
             builder.deleteCharAt(builder.length() - 1);
-            builder.append("]");
+            builder.append("]\n");
         }
         return builder.toString();
     }
