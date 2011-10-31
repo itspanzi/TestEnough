@@ -14,7 +14,12 @@ public class Track {
             public void run() {
                 File file = new File(configuration.trackingInfoFilePath());
                 try {
-                    FileUtils.writeStringToFile(file, trackingInfoToPersist());
+                    String contents = "";
+                    if (file.exists()) {
+                        contents = FileUtils.readFileToString(file);
+                    }
+                    contents = contents + "\n" + trackingInfoToPersist();
+                    FileUtils.writeStringToFile(file, contents);
                 } catch (IOException e) {
                     throw new RuntimeException("Could not persist tracking information to file: " + file);
                 }

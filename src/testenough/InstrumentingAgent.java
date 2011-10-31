@@ -1,6 +1,7 @@
 package testenough;
 
 import org.apache.commons.io.FileUtils;
+import testenough.counter.Track;
 import testenough.weaver.BCWeaver;
 
 import java.io.File;
@@ -23,6 +24,7 @@ public class InstrumentingAgent {
         addJarsFromLibToBootstrapperClassPath(instrumentation, nameToValues);
         Configuration configuration = new Configuration(configContents(nameToValues));
         instrumentation.addTransformer(new BCWeaver(configuration));
+        Track.setConfiguration(configuration);
     }
 
     private static void addJarsFromLibToBootstrapperClassPath(Instrumentation instrumentation, Map<String, String> nameToValues) throws IOException {
@@ -34,7 +36,14 @@ public class InstrumentingAgent {
     }
 
     private static Collection<File> allJarsInTheDir(String libDir) {
-        return FileUtils.listFiles(new File(libDir), new String[]{"jar"}, true);
+        File file = new File(libDir);
+        if (!file.exists()) {
+            throw new IllegalArgumentException(String.format("Lib directory '%s' not found. Please make sure you provide the right path to the library directory.", file.getPath()));
+        }
+        if (!file.isDirectory()) {
+            throw new IllegalArgumentException(String.format("Lib directory '%s' is not a directory. Please make sure you provide the right path to the library directory.", file.getPath()));
+        }
+        return FileUtils.listFiles(file, new String[]{"jar"}, true);
     }
 
     private static String configContents(Map<String, String> nameToValues) throws IOException {
@@ -48,10 +57,10 @@ public class InstrumentingAgent {
 
     private static Map<String, String> parseArguments(String argument) {
         Map<String, String> nameToValues = new HashMap<String, String>();
-        if (argument.trim().isEmpty()) return nameToValues;
-        for (String arg : argument.split("&")) {
+        if (argument == null || argument.trim().isEmpty()) return nameToValues;
+        for (String arg : argument.split("=")) {
             if (!arg.contains(":")) {
-                throw new IllegalArgumentException("Arguments are name value pairs. Name and value are separated using ':'. Multiple arguments are separated using '&'");
+                throw new IllegalArgumentException("Arguments are name value pairs. Name and value are separated using ':'. Multiple arguments are separated using '='");
             }
             String[] nameAndValue = arg.split(":");
             nameToValues.put(nameAndValue[0], nameAndValue[1]);
