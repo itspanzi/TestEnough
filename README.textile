@@ -37,10 +37,36 @@ If you are using *ANT* you can use *TestEnough* in 2 ways based on how you run y
 * Fork Mode: If you run your JUnit tests using the _fork=true_ option, you need to pass the above arguments as 2 _<jvmarg>_ under _<junit>_ tag. 1 _<jvmarg>_ for the "javaagent" and the other for the "Xbootclasspath" options. For example:
 
 bq. @<jvmarg>-javaagent:test-enough/test-enough-0.1.jar=configFilePath:test-enough/config.properties=lib:test-enough/lib</jvmarg>@
+
 bq. @<jvmarg>-Xbootclasspath/a:test-enough/lib/commons-io-2.0.1.jar</jvmarg>@
 
 * Non-Fork Mode: If you are not forking your tests, then you need to set the environment variable "ANT_OPTS" with both the arguments as the value. For example:
+
 bq. @export ANT_OPTS="-javaagent:test-enough/test-enough-0.1.jar=configFilePath:test-enough/config.properties=lib:test-enough/lib -Xbootclasspath/a:test-enough/lib/commons-io-2.0.1.jar"@
+
+Here, you should replace the paths to the real path of the resources.
+
+h2. Configuration
+
+*TestEnough* requires as little configuration as possible in order to get up and running. However, you can customize a bunch of things using the *config.properties* file.
+
+You need to pass the config file path as an argument to the javaagent. The name of the argument is "configFilePath". The value is the path. The *TestEnough* package contains a config.properties file that has all the properties and the corresponding values they can take.
+
+Checkout the *config.properties* file and set the properties properly.
+
+h4. Properties and meaning
+
+* sampleProductionClass [*MANDATORY*]: This property gives the name of any one class in your application under test. This is used to figure out the class loader from which this class gets loaded. This is how we get an access to all the classes that get loaded so that we can BCI them.
+
+* populateIncludePackages: This property specifies a comma separated list of packages that you want to track test information for. If you leave this out all classes (including libraries that your application depends upon) get tracked. *It will be a good idea to specify this* since instrumenting everything may affect test run times.
+
+* testClassPattern: This property represents the pattern which the names of the test classes follow. Using this, Test Enough figures out what the test class is. Using this information, test enough knows which test class is calling the tracker.
+
+* trackingInformationFilePath: This property represents the file path where the tracking information needs to be persisted. It is this file that will be used in order to figure out which tests need to be run based on production code changes.
+
+* codeToInsert: This is the code that is used for instrumentation. Override this if you know what you want. This will change the default
+
+* behaviour of the tool. This is more for developers to plug things in.
 
 h2. How?
 
