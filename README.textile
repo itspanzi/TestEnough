@@ -35,6 +35,7 @@ h3. Using TestEnough with Ant
 If you are using *ANT* you can use *TestEnough* in 2 ways based on how you run your tests
 
 * Fork Mode: If you run your JUnit tests using the _fork=true_ option, you need to pass the above arguments as 2 _<jvmarg>_ under _<junit>_ tag. 1 _<jvmarg>_ for the "javaagent" and the other for the "Xbootclasspath" options. For example:
+
 bq. @<jvmarg>-javaagent:test-enough/test-enough-0.1.jar=configFilePath:test-enough/config.properties=lib:test-enough/lib</jvmarg>@
 bq. @<jvmarg>-Xbootclasspath/a:test-enough/lib/commons-io-2.0.1.jar</jvmarg>@
 
