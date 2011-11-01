@@ -12,7 +12,21 @@ It also seems like a huge waste to run all tests when the change made is quite s
 
 To address these, is why *TestEnough* came into existence.
 
-h2. How?
+h2. Getting started
+
+* Get hold of the *TestEnough* package. You can either
+** Download a stable build to get a tar ball or
+** You can source compile. There is an ant build file in the source root. You can run @ant pkg@ in the checkout folder. This runs all the tests and generates the tar ball in _target/pkg_ folder.
+* Extract the tar ball
+* In order to hook up *TestEnough* to your tests, you need to add these JVM argument to your test running JVM. @-javaagent:test-enough/test-enough-0.1.jar=configFilePath:test-enough/config.properties=lib:test-enough/lib -Xbootclasspath/a:test-enough/lib/commons-io-2.0.1.jar@
+** In the above arguments, if you notice, _you need to provide the path to 4 things_ - the *TestEnough* jar, the *TestEnough* configuration, the libraries on which *TestEnough* depends on and the commons-io jar. All these paths are to resources available inside the obtained tar ball.
+** Its preferred to have the extracted directory checked in and the above paths referred to using relative paths
+* If you are using *ANT* you can use *TestEnough* in 2 ways based on how you run your tests
+** Fork Mode: If you run your JUnit tests using the _fork=true_ option, you need to pass the above arguments as 2 _<jvmarg>_ under _<junit>_ tag. 1 _<jvmarg>_ for the "javaagent" and the other for the "Xbootclasspath" options. Eg: @<jvmarg>-javaagent:test-enough/test-enough-0.1.jar=configFilePath:test-enough/config.properties=lib:test-enough/lib</jvmarg>
+                                               <jvmarg>-Xbootclasspath/a:test-enough/lib/commons-io-2.0.1.jar</jvmarg>@
+** Non-Fork Mode: If you are not forking your tests, then you need to set the environment variable "ANT_OPTS" with both the arguments as the value. Eg: @export ANT_OPTS="-javaagent:test-enough/test-enough-0.1.jar=configFilePath:test-enough/config.properties=lib:test-enough/lib -Xbootclasspath/a:test-enough/lib/commons-io-2.0.1.jar"@
+
+ h2. How?
 
 *TestEnough* is a Java agent library that uses *Byte Code Instrumentation* to figure out what methods were called. One can configure what is a test and what is production code which would then let *TestEnough* figure out what all code gets called from a given test. It maintains a map of "Method => [Tests]".
 
