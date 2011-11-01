@@ -38,7 +38,7 @@ public class InstrumentingAgent {
     private static Collection<File> allJarsInTheDir(String libDir) {
         File file = new File(libDir);
         if (!file.exists()) {
-            throw new IllegalArgumentException(String.format("Lib directory '%s' not found. Please make sure you provide the right path to the library directory.", file.getPath()));
+            throw new IllegalArgumentException(String.format("Lib directory '%s' not found. Please make sure you provide the right path to the library directory. The file's absolute path is: %s", file.getPath(), file.getAbsolutePath()));
         }
         if (!file.isDirectory()) {
             throw new IllegalArgumentException(String.format("Lib directory '%s' is not a directory. Please make sure you provide the right path to the library directory.", file.getPath()));

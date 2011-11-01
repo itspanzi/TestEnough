@@ -14,6 +14,7 @@ import java.util.jar.JarFile;
 import static junit.framework.Assert.fail;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.internal.matchers.StringContains.containsString;
 import static org.mockito.Mockito.*;
 
 public class InstrumentingAgentTest {
@@ -89,7 +90,7 @@ public class InstrumentingAgentTest {
             InstrumentingAgent.premain(String.format("%s:not_found", InstrumentingAgent.LIB_DIR), instrumentation);
             fail("Should have failed since the lib directory is not found");
         } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), is(String.format("Lib directory '%s' not found. Please make sure you provide the right path to the library directory.", new File("not_found").getPath())));
+            assertThat(e.getMessage(), containsString(String.format("Lib directory '%s' not found. Please make sure you provide the right path to the library directory.", new File("not_found").getPath())));
         }
     }
 

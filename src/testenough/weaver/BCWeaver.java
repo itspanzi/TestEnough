@@ -36,6 +36,7 @@ public class BCWeaver implements ClassFileTransformer {
             }
             return ctClass.toBytecode();
         } catch (Exception e) {
+            System.out.println("Could not instrument. " + e.getMessage());
             throw new RuntimeException("Could not instrument", e);
         }
     }
