@@ -1,11 +1,13 @@
 package testenough.counter;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import testenough.Configuration;
 import testenough.fortest.FakeTestClass;
 import testenough.fortest.SampleProductionCodeClass;
 
+import java.io.File;
 import java.util.Set;
 
 import static org.hamcrest.core.Is.is;
@@ -95,4 +97,42 @@ public class TrackTest {
         assertThat(data, containsString(String.format("%s=>[%s]", methodAsString(SampleProductionCodeClass.AnInnerClass.class.getName(), "innerMethod"), getClass().getName())));
         assertThat(data, containsString(String.format("%s=>[%s,%s]", methodAsString(FakeTestClass.class.getName(), "callTracker"), getClass().getName(), FakeTestClass.class.getName())));
     }
+
+    @Test
+    public void testLoadHistoricalDataFromTheGivenFile() throws Exception {
+        TrackingInformation trackingInformation = new TrackingInformation();
+        trackingInformation.trackTest("Class1:method1", new StackTraceElement("ClassTest", "testSomething", "ClassTest.java", 1));
+        trackingInformation.trackTest("Class1:method1", new StackTraceElement("DifferentTest", "testSomethingElse", "DifferentTest.java", 1));
+        trackingInformation.trackTest("Class1:method2", new StackTraceElement("DifferentTest", "testSecond", "DifferentTest.java", 10));
+
+        FileUtils.writeStringToFile(new File("out/te_tracking_info.txt"), trackingInformation.trackingInfoToPersist());
+
+        Track.setConfiguration(new Configuration(String.format("%s=out/te_tracking_info.txt", Configuration.TRACKING_INFO_FILE_PATH)));
+        Track.loadOldTrackingInfo();
+
+        assertThat(Track.testsFor(methodAsString("Class1", "method1")), hasItem("ClassTest"));
+        assertThat(Track.testsFor(methodAsString("Class1", "method1")), hasItem("DifferentTest"));
+        assertThat(Track.testsFor(methodAsString("Class1", "method2")), hasItem("DifferentTest"));
+    }
+
+    @Test
+    public void testOverwriteTheHistoricalDataFromTheGivenFile() throws Exception {
+        TrackingInformation trackingInformation = new TrackingInformation();
+        trackingInformation.trackTest("Class1:method1", new StackTraceElement("ClassTest", "testSomething", "ClassTest.java", 1));
+        trackingInformation.trackTest("Class1:method1", new StackTraceElement("DifferentTest", "testSomethingElse", "DifferentTest.java", 1));
+        trackingInformation.trackTest("Class1:method2", new StackTraceElement("DifferentTest", "testSecond", "DifferentTest.java", 10));
+
+        File file = new File("out/te_tracking_info.txt");
+        FileUtils.writeStringToFile(file, trackingInformation.trackingInfoToPersist());
+
+        Track.setConfiguration(new Configuration(String.format("%s=out/te_tracking_info.txt", Configuration.TRACKING_INFO_FILE_PATH)));
+        Track.loadOldTrackingInfo();
+        Track.reset();
+
+        Track.shutdownHook().run();
+
+        assertThat(FileUtils.readFileToString(file), is(""));
+    }
+
+
 }

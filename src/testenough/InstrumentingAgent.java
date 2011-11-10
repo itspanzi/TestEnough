@@ -25,6 +25,7 @@ public class InstrumentingAgent {
         Configuration configuration = new Configuration(configContents(nameToValues));
         instrumentation.addTransformer(new BCWeaver(configuration));
         Track.setConfiguration(configuration);
+        Track.loadOldTrackingInfo();
     }
 
     private static void addJarsFromLibToBootstrapperClassPath(Instrumentation instrumentation, Map<String, String> nameToValues) throws IOException {
