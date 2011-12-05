@@ -56,7 +56,7 @@
     </target>
 
     <target name="test" depends="compile.tests, compile">
-        <junit failureproperty="test.failure" printsummary="yes" haltonfailure="true" fork="false">
+        <junit failureproperty="test.failure" printsummary="yes" haltonfailure="true" fork="true">
             <classpath refid="test.classpath"/>
             <batchtest todir="${test.reports.dir}">
                 <fileset dir="${test.classes.dir}" includes="**/*Test.class*"/>
@@ -80,7 +80,6 @@
         <property name="test.enough.pkg.name" value="${test.enough.basename}.tar.gz"/>
         <property name="test.enough.pkg.path" value="${pkg.dir}/${test.enough.basename}.tar"/>
         <property name="test.enough.src.jar.name" value="${test.enough.basename}-src.jar"/>
-
         <jar destfile="${test.enough.jar.path}">
             <fileset dir="${classes.dir}"/>
             <manifest>
@@ -97,5 +96,24 @@
         </copy>
         <copy todir="${test.enough.basepath}" file="${basedir}/LICENSE"/>
         <tar basedir="${pkg.dir}" destfile="${pkg.dir}/${test.enough.pkg.name}" compression="gzip" />
+    </target>
+
+    <target name="dog.food" depends="pkg, -load.short.rev">
+        <path id="dog.food.classpath">
+            <pathelement path="${test.classes.dir}"/>
+            <path refid="src.classpath"/>
+            <path refid="test.dependencies"/>
+            <pathelement path="${test.enough.jar.path}"/>
+        </path>
+        <typedef classname="testenough.TestsPruner" classpathref="dog.food.classpath" name="prunedTestFiles"/>
+        <junit failureproperty="test.failure" printsummary="yes" haltonfailure="true" fork="true">
+            <classpath refid="test.classpath"/>
+            <jvmarg value="-Xbootclasspath/a:${lib.dir}/commons-io-2.0.1.jar"/>
+            <jvmarg value="-javaagent:${test.enough.jar.path}=configFilePath:${release.dir}/config.properties=lib:${lib.dir}" />
+            <batchtest todir="${test.reports.dir}">
+                <prunedTestFiles dir="${test.classes.dir}" includes="**/*Test.class*"/>
+                <formatter type="plain"/>
+            </batchtest>
+        </junit>
     </target>
 </project>

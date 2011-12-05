@@ -88,4 +88,12 @@ public class Configuration {
     public String trackingInfoFilePath() {
         return properties.getProperty(TRACKING_INFO_FILE_PATH, "out/te_tracking_info.txt");
     }
+
+    public String repoLocation() {
+        return ".";
+    }
+
+    public String revisionToUse() {
+        return "HEAD";
+    }
 }

@@ -15,7 +15,6 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.StringContains.containsString;
-import static testenough.counter.Track.methodAsString;
 
 public class TrackTest {
 
@@ -30,7 +29,7 @@ public class TrackTest {
         SampleProductionCodeClass obj = new SampleProductionCodeClass();
         obj.sampleMethod();
 
-        Set<String> tests = Track.testsFor(methodAsString("testenough.fortest.SampleProductionCodeClass", "sampleMethod"));
+        Set<String> tests = Track.testsFor("testenough.fortest.SampleProductionCodeClass");
         assertThat(tests.size(), is(1));
         assertThat(tests, hasItem(getClass().getName()));
     }
@@ -40,7 +39,7 @@ public class TrackTest {
         Track.setConfiguration(config(".*Test|.*TestClass"));
         FakeTestClass.callTracker();
 
-        Set<String> tests = Track.testsFor(methodAsString(FakeTestClass.class.getName(), "callTracker"));
+        Set<String> tests = Track.testsFor(FakeTestClass.class.getName());
         assertThat(tests.size(), is(2));
         assertThat(tests, hasItem(getClass().getName()));
         assertThat(tests, hasItem(FakeTestClass.class.getName()));
@@ -50,7 +49,7 @@ public class TrackTest {
     public void testShouldTrackThisTestClassAsTestingAGivenMethodEvenWhenThereAreMultipleTestCaseCalls() throws Exception {
         testMethodThatCallsProductionCode();
 
-        Set<String> tests = Track.testsFor(methodAsString("testenough.fortest.SampleProductionCodeClass", "sampleMethod"));
+        Set<String> tests = Track.testsFor("testenough.fortest.SampleProductionCodeClass");
         assertThat(tests.size(), is(1));
         assertThat(tests, hasItem(getClass().getName()));
     }
@@ -67,13 +66,13 @@ public class TrackTest {
         SampleProductionCodeClass obj = new SampleProductionCodeClass();
         obj.sampleMethod();
 
-        assertThat(Track.testsFor(methodAsString("testenough.fortest.SampleProductionCodeClass", "sampleMethod")), is(nullValue()));
+        assertThat(Track.testsFor("testenough.fortest.SampleProductionCodeClass"), is(nullValue()));
 
         Track.setConfiguration(new Configuration(String.format("%s=.*CodeClass", Configuration.TEST_CLASS_PATTERN)));
 
         obj.sampleMethod();
 
-        assertThat(Track.testsFor(methodAsString("testenough.fortest.SampleProductionCodeClass", "sampleMethod")),
+        assertThat(Track.testsFor("testenough.fortest.SampleProductionCodeClass"),
                 hasItem(obj.getClass().getName()));
     }
 
@@ -92,27 +91,27 @@ public class TrackTest {
 
         String data = Track.trackingInfoToPersist();
 
-        assertThat(data, containsString(String.format("%s=>[%s]", methodAsString(SampleProductionCodeClass.class.getName(), "sampleMethod"), getClass().getName())));
-        assertThat(data, containsString(String.format("%s=>[%s]", methodAsString(SampleProductionCodeClass.class.getName(), "anotherMethod"), getClass().getName())));
-        assertThat(data, containsString(String.format("%s=>[%s]", methodAsString(SampleProductionCodeClass.AnInnerClass.class.getName(), "innerMethod"), getClass().getName())));
-        assertThat(data, containsString(String.format("%s=>[%s,%s]", methodAsString(FakeTestClass.class.getName(), "callTracker"), getClass().getName(), FakeTestClass.class.getName())));
+        assertThat(data, containsString(String.format("%s=>[%s]", SampleProductionCodeClass.class.getName(), getClass().getName())));
+        assertThat(data, containsString(String.format("%s=>[%s]", SampleProductionCodeClass.class.getName(), getClass().getName())));
+        assertThat(data, containsString(String.format("%s=>[%s]", SampleProductionCodeClass.AnInnerClass.class.getName(), getClass().getName())));
+        assertThat(data, containsString(String.format("%s=>[%s,%s]", FakeTestClass.class.getName(), getClass().getName(), FakeTestClass.class.getName())));
     }
 
     @Test
     public void testLoadHistoricalDataFromTheGivenFile() throws Exception {
         TrackingInformation trackingInformation = new TrackingInformation();
-        trackingInformation.trackTest("Class1:method1", new StackTraceElement("ClassTest", "testSomething", "ClassTest.java", 1));
-        trackingInformation.trackTest("Class1:method1", new StackTraceElement("DifferentTest", "testSomethingElse", "DifferentTest.java", 1));
-        trackingInformation.trackTest("Class1:method2", new StackTraceElement("DifferentTest", "testSecond", "DifferentTest.java", 10));
+        trackingInformation.trackTest("Class1", new StackTraceElement("ClassTest", "testSomething", "ClassTest.java", 1));
+        trackingInformation.trackTest("Class1", new StackTraceElement("DifferentTest", "testSomethingElse", "DifferentTest.java", 1));
+        trackingInformation.trackTest("Class1", new StackTraceElement("DifferentTest", "testSecond", "DifferentTest.java", 10));
 
         FileUtils.writeStringToFile(new File("out/te_tracking_info.txt"), trackingInformation.trackingInfoToPersist());
 
         Track.setConfiguration(new Configuration(String.format("%s=out/te_tracking_info.txt", Configuration.TRACKING_INFO_FILE_PATH)));
         Track.loadOldTrackingInfo();
 
-        assertThat(Track.testsFor(methodAsString("Class1", "method1")), hasItem("ClassTest"));
-        assertThat(Track.testsFor(methodAsString("Class1", "method1")), hasItem("DifferentTest"));
-        assertThat(Track.testsFor(methodAsString("Class1", "method2")), hasItem("DifferentTest"));
+        assertThat(Track.testsFor("Class1"), hasItem("ClassTest"));
+        assertThat(Track.testsFor("Class1"), hasItem("DifferentTest"));
+        assertThat(Track.testsFor("Class1"), hasItem("DifferentTest"));
     }
 
     @Test

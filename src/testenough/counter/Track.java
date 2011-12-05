@@ -16,6 +16,7 @@ public class Track {
     static Runnable shutdownHook() {
         return new Runnable() {
             public void run() {
+                if (configuration == null) return;
                 File file = new File(configuration.trackingInfoFilePath());
                 try {
                     FileUtils.writeStringToFile(file, trackingInformation.trackingInfoToPersist());
@@ -44,20 +45,16 @@ public class Track {
         return configuration.testClassNamePattern();
     }
 
-    public static String methodAsString(String fqn, String method) {
-        return fqn + ":" + method;
-    }
-
     private static String methodAsString(StackTraceElement frame) {
-        return methodAsString(frame.getClassName(), frame.getMethodName());
+        return frame.getClassName();
     }
 
     public static void setConfiguration(Configuration configuration) {
         Track.configuration = configuration;
     }
 
-    public static Set<String> testsFor(String methodAsString) {
-        return trackingInformation.get(methodAsString);
+    public static Set<String> testsFor(String testClass) {
+        return trackingInformation.get(testClass);
     }
 
     public static void reset() {
@@ -70,5 +67,13 @@ public class Track {
 
     public static void loadOldTrackingInfo() {
         trackingInformation.loadFrom(new File(configuration.trackingInfoFilePath()));
+    }
+
+    public static void setTrackingInformation(TrackingInformation trackingInformation) {
+        Track.trackingInformation = trackingInformation;
+    }
+
+    public static boolean hasTest(String testClass) {
+        return trackingInformation.hasTest(testClass);
     }
 }

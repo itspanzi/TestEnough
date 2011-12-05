@@ -33,6 +33,10 @@
       <profile version="1.0" is_locked="false">
         <option name="myName" value="Project Default" />
         <option name="myLocal" value="false" />
+        <inspection_tool class="IgnoreResultOfCall" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="m_reportAllNonLibraryCalls" value="false" />
+          <option name="callCheckString" value="java.io.InputStream,read,java.io.InputStream,skip,java.lang.StringBuffer,toString,java.lang.StringBuilder,toString,java.lang.String,.*,java.math.BigInteger,.*,java.math.BigDecimal,.*,java.net.InetAddress,.*,java.io.File,.*,java.lang.Object,equals|hashCode" />
+        </inspection_tool>
         <inspection_tool class="JavaDoc" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="TOP_LEVEL_CLASS_OPTIONS">
             <value>
@@ -245,7 +249,11 @@
         <root url="file://$PROJECT_DIR$/lib" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES />
+      <SOURCES>
+        <root url="jar://$PROJECT_DIR$/lib/javassist.jar!/" />
+        <root url="file://$USER_HOME$/Downloads/apache-ant-1.7.1/src" />
+        <root url="file://$USER_HOME$/Downloads/apache-ant-1.7.1/src/main" />
+      </SOURCES>
       <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" />
     </library>
     <library name="test-lib">

@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 /**
 * @understands method to tests mapping
 */
-class TrackingInformation {
+public class TrackingInformation {
 
     private static final Pattern VALUES_REGEX = Pattern.compile("\\[(.*)\\]");
     private Map<String, Set<String>> methodToTests = new HashMap<String, Set<String>>();
@@ -48,25 +48,35 @@ class TrackingInformation {
 
     public void loadFrom(File filePath) {
         try {
-            List<String> lines = FileUtils.readLines(filePath);
-            for (String line : lines) {
-                String[] keyAndValues = line.split("=>");
-                Matcher matcher = VALUES_REGEX.matcher(keyAndValues[1]);
-                String[] values = null;
-                if (matcher.matches()) {
-                    values = matcher.group(1).split(",");
-                }
-                methodToTests.put(keyAndValues[0], values(values));
-            }
+            loadFrom(FileUtils.readLines(filePath));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    public void loadFrom(List<String> methodToTestsList) {
+        for (String line : methodToTestsList) {
+            String[] keyAndValues = line.split("=>");
+            Matcher matcher = VALUES_REGEX.matcher(keyAndValues[1]);
+            String[] values = null;
+            if (matcher.matches()) {
+                values = matcher.group(1).split(",");
+            }
+            methodToTests.put(keyAndValues[0], values(values));
+        }
     }
 
     private TreeSet<String> values(String[] values) {
         TreeSet<String> vals = new TreeSet<String>();
         Collections.addAll(vals, values);
         return vals;
+    }
+
+    public boolean hasTest(String testClass) {
+        Set<String> tests = new LinkedHashSet<String>();
+        for (Set<String> value : methodToTests.values()) {
+            tests.addAll(value);
+        }
+        return tests.contains(testClass);
     }
 }
