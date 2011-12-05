@@ -13,6 +13,7 @@ public class Configuration {
     public static final String CODE_TO_INSERT = "codeToInsert";
     public static final String TEST_CLASS_PATTERN = "testClassPattern";
     public static final String TRACKING_INFO_FILE_PATH = "trackingInformationFilePath";
+    public static final String REPOSITORY_LOCATION = "repositoryLocation";
 
     public Configuration(String config) {
         parseConfig(config);
@@ -90,7 +91,7 @@ public class Configuration {
     }
 
     public String repoLocation() {
-        return ".";
+        return properties.getProperty(REPOSITORY_LOCATION, ".");
     }
 
     public String revisionToUse() {

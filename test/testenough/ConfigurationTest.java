@@ -65,4 +65,12 @@ public class ConfigurationTest {
         configuration = new Configuration("");
         assertThat(configuration.trackingInfoFilePath(), is("out/te_tracking_info.txt"));
     }
+
+    @Test
+    public void testShouldGiveTheRepositoryLocation() throws Exception {
+        Configuration configuration = new Configuration(String.format("%s=../foo/bar", Configuration.REPOSITORY_LOCATION));
+        assertThat(configuration.repoLocation(), is("../foo/bar"));
+        configuration = new Configuration("");
+        assertThat(configuration.repoLocation(), is("."));
+    }
 }

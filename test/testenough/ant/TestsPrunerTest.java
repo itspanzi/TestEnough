@@ -1,4 +1,4 @@
-package testenough;
+package testenough.ant;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.Project;
@@ -6,6 +6,8 @@ import org.apache.tools.ant.types.resources.FileResource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import testenough.Configuration;
+import testenough.ant.TestsPruner;
 import testenough.counter.Track;
 import testenough.counter.TrackingInformation;
 

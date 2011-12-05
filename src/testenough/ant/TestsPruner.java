@@ -1,7 +1,8 @@
-package testenough;
+package testenough.ant;
 
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.resources.FileResource;
+import testenough.Configuration;
 import testenough.counter.Track;
 import testenough.scm.GitRepository;
 import testenough.scm.ModifiedFile;

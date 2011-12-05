@@ -105,7 +105,7 @@
             <path refid="test.dependencies"/>
             <pathelement path="${test.enough.jar.path}"/>
         </path>
-        <typedef classname="testenough.TestsPruner" classpathref="dog.food.classpath" name="prunedTestFiles"/>
+        <typedef classname="testenough.ant.TestsPruner" classpathref="dog.food.classpath" name="prunedTestFiles"/>
         <junit failureproperty="test.failure" printsummary="yes" haltonfailure="true" fork="true">
             <classpath refid="test.classpath"/>
             <jvmarg value="-Xbootclasspath/a:${lib.dir}/commons-io-2.0.1.jar"/>
